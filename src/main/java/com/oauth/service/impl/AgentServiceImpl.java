@@ -7,10 +7,12 @@ import com.oauth.repo.AgentRepo;
 import com.oauth.service.AgentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class AgentServiceImpl implements AgentService {
 
     @Autowired
@@ -21,7 +23,7 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public AgentDto createAgent(AgentDto agentDto) {
-        if(agentRepo.existByEmail(agentDto.getAgentEmail())){
+        if(this.agentRepo.existsByEmail(agentDto.getEmail())){
             throw new RuntimeException("Agent Already exist");
         }
         Agent agent = this.mapper.map(agentDto, Agent.class);
@@ -51,6 +53,14 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public AgentDto updateAgent(AgentDto agentDto, Integer id) {
-        return null;
+        Agent agent = this.agentRepo.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Agent", "Agent Id", id));
+        agent.setEmail(agentDto.getEmail());
+        agent.setAgentName(agentDto.getAgentName());
+        agent.setPassword(agentDto.getPassword());
+        agent.setAgentCity(agentDto.getAgentCity());
+        agent.setAgentState(agentDto.getAgentState());
+        this.agentRepo.save(agent);
+        return this.mapper.map(agent, AgentDto.class);
     }
 }

@@ -19,7 +19,10 @@ public class AgentDto {
 
     @Email
     @NotBlank(message = "Add your email here")
-    private String agentEmail;
+    private String email;
+
+    @NotBlank(message = "Password must contain alpha-numeric and special character value")
+    private String password;
 
     @NotBlank(message = "Mobile Number is Required")
     @Pattern(regexp = "^[0-9]{10}$", message = "Must contain 10 digit")
