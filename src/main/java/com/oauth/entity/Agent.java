@@ -38,6 +38,7 @@ public class Agent {
     @Column(nullable = false)
     private String agentState;
 
-    private Set<Role> roles = new HashSet<>();
-
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
+    private Role role;
 }

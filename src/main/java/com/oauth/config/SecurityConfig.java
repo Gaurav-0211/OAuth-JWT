@@ -30,10 +30,9 @@ public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     @Autowired
     private UserDetailsService userDetailsService;
-
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -43,18 +42,14 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        //.requestMatchers(HttpMethod.GET).permitAll()
-//                        .requestMatchers(HttpMethod.DELETE).permitAll()
-//                        .requestMatchers(HttpMethod.POST).permitAll()
-//                        .requestMatchers(HttpMethod.PUT).permitAll()
-                          .requestMatchers(HttpMethod.PUT, "/api/agents/**").hasRole("NORMAL_USER")
-                          .requestMatchers(HttpMethod.DELETE,"/api/agents/**").hasRole("ADMIN_USER")
-                                .requestMatchers(HttpMethod.POST,"/api/agents/**").hasRole("NORMAL_USER" )
-                                .requestMatchers(HttpMethod.GET,"/api/agents/**").hasRole("NORMAL_USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/agents/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/agents/**").hasRole("ADMIN")
+                        //.requestMatchers(HttpMethod.POST, "/api/agents/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/agents/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST).permitAll()
                         .anyRequest().authenticated()
                 );
 
-        // Injecting manually-created bean
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -64,6 +59,4 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
 }
-

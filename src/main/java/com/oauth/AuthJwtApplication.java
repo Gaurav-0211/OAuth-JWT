@@ -3,40 +3,38 @@ package com.oauth;
 import com.oauth.config.AppConstants;
 import com.oauth.entity.Role;
 import com.oauth.repo.RoleRepo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 
 import java.util.List;
 
 @SpringBootApplication
 public class AuthJwtApplication {
 
-	@Autowired
-	private static RoleRepo roleRepo;
-
-
 	public static void main(String[] args) {
 		SpringApplication.run(AuthJwtApplication.class, args);
-		try {
+	}
+
+	@Bean
+	public CommandLineRunner initRoles(RoleRepo roleRepo) {
+		return args -> {
 			if (roleRepo.count() == 0) {
-				Role role = new Role();
-				role.setId(AppConstants.ADMIN_USER);
-				role.setName("ADMIN_USER");
+				Role roleAdmin = new Role();
+				roleAdmin.setId(AppConstants.ADMIN);
+				roleAdmin.setName("ROLE_ADMIN");
 
-				Role role1 = new Role();
-				role1.setId(AppConstants.NORMAL_USER);
-				role1.setName("NORMAL_USER");
+				Role roleUser = new Role();
+				roleUser.setId(AppConstants.NORMAL);
+				roleUser.setName("ROLE_USER");
 
-				List<Role> roles = List.of(role, role1);
-				List<Role> result = roleRepo.saveAll(roles);
-				result.forEach(r -> System.out.println(r.getName()));
+				List<Role> roles = List.of(roleAdmin, roleUser);
+				List<Role> savedRoles = roleRepo.saveAll(roles);
+				savedRoles.forEach(r -> System.out.println("Inserted: " + r.getName()));
 			} else {
 				System.out.println("Roles already exist. Skipping insertion.");
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		};
 	}
-
 }

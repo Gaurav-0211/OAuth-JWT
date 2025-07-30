@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,4 +35,5 @@ public class AgentDto {
     @NotBlank(message = "State is Required")
     private String agentState;
 
+    private RoleDto roleDto;
 }

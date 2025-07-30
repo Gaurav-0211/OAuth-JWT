@@ -42,8 +42,9 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
         }
         Agent agent = this.mapper.map(agentDto, Agent.class);
         agent.setPassword(passwordEncoder.encode(agent.getPassword()));
-        Role role = this.roleRepo.findById(AppConstants.NORMAL_USER).get();
-        agent.getRoles().add(role);
+        Role role = this.roleRepo.findById(AppConstants.NORMAL)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "ID", AppConstants.NORMAL));
+        agent.setRole(role);
         this.agentRepo.save(agent);
         return this.mapper.map(agent,AgentDto.class);
     }
@@ -74,7 +75,7 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
                 .orElseThrow(()-> new ResourceNotFoundException("Agent", "Agent Id", id));
         agent.setEmail(agentDto.getEmail());
         agent.setAgentName(agentDto.getAgentName());
-        agent.setPassword(agentDto.getPassword());
+        agent.setPassword(passwordEncoder.encode(agentDto.getPassword()));
         agent.setAgentCity(agentDto.getAgentCity());
         agent.setAgentState(agentDto.getAgentState());
         this.agentRepo.save(agent);
@@ -89,9 +90,7 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 agent.getEmail(),
                 agent.getPassword(),
-                agent.getRoles().stream()
-                        .map(role -> new SimpleGrantedAuthority(role.getName()))
-                        .collect(Collectors.toList())
+                List.of(new SimpleGrantedAuthority(agent.getRole().getName()))
         );
     }
 }
