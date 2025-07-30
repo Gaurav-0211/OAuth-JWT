@@ -7,13 +7,17 @@ import com.oauth.repo.AgentRepo;
 import com.oauth.service.AgentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class AgentServiceImpl implements AgentService {
+public class AgentServiceImpl implements AgentService, UserDetailsService {
 
     @Autowired
     private AgentRepo agentRepo;
@@ -62,5 +66,15 @@ public class AgentServiceImpl implements AgentService {
         agent.setAgentState(agentDto.getAgentState());
         this.agentRepo.save(agent);
         return this.mapper.map(agent, AgentDto.class);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Agent agent = agentRepo.findByEmail(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Agent","Agent Id"+username,0));
+
+        return new org.springframework.security.core.userdetails.User(
+                agent.getEmail(), agent.getPassword(), new ArrayList<>()
+        );
     }
 }
