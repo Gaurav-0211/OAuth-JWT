@@ -1,18 +1,22 @@
 package com.oauth.service.impl;
 
+import com.oauth.config.AppConstants;
 import com.oauth.dto.AgentDto;
 import com.oauth.entity.Agent;
+import com.oauth.entity.Role;
 import com.oauth.exception.ResourceNotFoundException;
 import com.oauth.repo.AgentRepo;
+import com.oauth.repo.RoleRepo;
 import com.oauth.service.AgentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,12 +29,21 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
     @Autowired
     private ModelMapper mapper;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RoleRepo roleRepo;
+
     @Override
     public AgentDto createAgent(AgentDto agentDto) {
         if(this.agentRepo.existsByEmail(agentDto.getEmail())){
             throw new RuntimeException("Agent Already exist");
         }
         Agent agent = this.mapper.map(agentDto, Agent.class);
+        agent.setPassword(passwordEncoder.encode(agent.getPassword()));
+        Role role = this.roleRepo.findById(AppConstants.NORMAL_USER).get();
+        agent.getRoles().add(role);
         this.agentRepo.save(agent);
         return this.mapper.map(agent,AgentDto.class);
     }
@@ -74,7 +87,11 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
                 .orElseThrow(() -> new ResourceNotFoundException("Agent","Agent Id"+username,0));
 
         return new org.springframework.security.core.userdetails.User(
-                agent.getEmail(), agent.getPassword(), new ArrayList<>()
+                agent.getEmail(),
+                agent.getPassword(),
+                agent.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getName()))
+                        .collect(Collectors.toList())
         );
     }
 }

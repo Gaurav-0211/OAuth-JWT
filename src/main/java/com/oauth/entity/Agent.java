@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -34,5 +37,7 @@ public class Agent {
 
     @Column(nullable = false)
     private String agentState;
+
+    private Set<Role> roles = new HashSet<>();
 
 }

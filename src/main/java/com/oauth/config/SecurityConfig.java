@@ -44,9 +44,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         //.requestMatchers(HttpMethod.GET).permitAll()
-                        .requestMatchers(HttpMethod.DELETE).permitAll()
-                        .requestMatchers(HttpMethod.POST).permitAll()
-                        .requestMatchers(HttpMethod.PUT).permitAll()
+//                        .requestMatchers(HttpMethod.DELETE).permitAll()
+//                        .requestMatchers(HttpMethod.POST).permitAll()
+//                        .requestMatchers(HttpMethod.PUT).permitAll()
+                          .requestMatchers(HttpMethod.PUT, "/api/agents/**").hasRole("NORMAL_USER")
+                          .requestMatchers(HttpMethod.DELETE,"/api/agents/**").hasRole("ADMIN_USER")
+                                .requestMatchers(HttpMethod.POST,"/api/agents/**").hasRole("NORMAL_USER" )
+                                .requestMatchers(HttpMethod.GET,"/api/agents/**").hasRole("NORMAL_USER")
                         .anyRequest().authenticated()
                 );
 
