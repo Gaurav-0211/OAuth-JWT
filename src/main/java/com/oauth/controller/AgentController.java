@@ -19,7 +19,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/agents")
@@ -42,8 +44,12 @@ public class AgentController {
 
     @PostMapping("/register")
     public ResponseEntity<AgentDto> create(@RequestBody @Valid AgentDto agentDto){
-        AgentDto agentDto1 = this.agentService.createAgent(agentDto);
-        return new ResponseEntity<AgentDto>(agentDto1, HttpStatus.CREATED);
+        try {
+            AgentDto agentDto1 = this.agentService.createAgent(agentDto);
+            return new ResponseEntity<AgentDto>(agentDto1, HttpStatus.CREATED);
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/{id}")
@@ -52,17 +58,22 @@ public class AgentController {
         return new ResponseEntity<AgentDto>(agentDto, HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<AgentDto>> getAll(){
         List<AgentDto> agents = this.agentService.getAllAgent();
         return new ResponseEntity<List<AgentDto>>(agents, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Integer id){
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Integer id) {
         this.agentService.deleteAgent(id);
-        return  ResponseEntity.noContent().build();
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "User with ID " + id + " has been successfully deleted.");
+
+        return ResponseEntity.ok(response);
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<AgentDto> update(@RequestBody AgentDto agentDto, @PathVariable Integer id){

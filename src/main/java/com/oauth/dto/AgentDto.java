@@ -1,7 +1,6 @@
 package com.oauth.dto;
 
 
-import com.oauth.config.RoleType;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
