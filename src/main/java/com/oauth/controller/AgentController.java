@@ -8,6 +8,7 @@ import com.oauth.exception.ResourceNotFoundException;
 import com.oauth.repo.AgentRepo;
 import com.oauth.security.JwtTokenHelper;
 import com.oauth.service.AgentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class AgentController {
     private JwtTokenHelper jwtTokenHelper;
 
     @PostMapping("/register")
-    public ResponseEntity<AgentDto> create(@RequestBody AgentDto agentDto){
+    public ResponseEntity<AgentDto> create(@RequestBody @Valid AgentDto agentDto){
         AgentDto agentDto1 = this.agentService.createAgent(agentDto);
         return new ResponseEntity<AgentDto>(agentDto1, HttpStatus.CREATED);
     }

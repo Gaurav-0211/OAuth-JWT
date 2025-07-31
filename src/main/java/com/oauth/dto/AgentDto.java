@@ -1,9 +1,8 @@
 package com.oauth.dto;
 
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import com.oauth.config.RoleType;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +14,8 @@ import lombok.Setter;
 public class AgentDto {
     private int id;
 
-    @NotBlank(message = "Name cannot be Blank")
+    @NotEmpty(message = "Name can't be Empty")
+    @Size(min = 2, max = 20, message = "Name can't be less that 2 character")
     private String agentName;
 
     @Email
@@ -23,6 +23,7 @@ public class AgentDto {
     private String email;
 
     @NotBlank(message = "Password must contain alpha-numeric and special character value")
+    @Size(min = 6, max = 20, message = "Make a secure password with special characters")
     private String password;
 
     @NotBlank(message = "Mobile Number is Required")
@@ -30,10 +31,14 @@ public class AgentDto {
     private String mobileNumber;
 
     @NotBlank(message = "City name is Required")
+    @Size(min = 3, max = 20,message= "City name can't be empty")
     private String agentCity;
 
     @NotBlank(message = "State is Required")
+    @Size(min = 3, max = 20, message = "State name can't be null")
     private String agentState;
+
+    private int roleId;
 
     private RoleDto roleDto;
 }

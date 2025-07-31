@@ -16,11 +16,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Validated
 public class AgentServiceImpl implements AgentService, UserDetailsService {
 
     @Autowired
@@ -42,9 +44,10 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
         }
         Agent agent = this.mapper.map(agentDto, Agent.class);
         agent.setPassword(passwordEncoder.encode(agent.getPassword()));
-        Role role = this.roleRepo.findById(4)
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "ID", RoleType.SUPER_ADMIN.ordinal()));
+
+        Role role = roleRepo.findById(agentDto.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Role","Role not found with roleId: " + agentDto.getRoleId(), agentDto.getRoleId()));
         agent.setRole(role);
+
         this.agentRepo.save(agent);
         return this.mapper.map(agent,AgentDto.class);
     }
