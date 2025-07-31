@@ -1,6 +1,5 @@
 package com.oauth.service.impl;
 
-import com.oauth.config.RoleType;
 import com.oauth.dto.AgentDto;
 import com.oauth.entity.Agent;
 import com.oauth.entity.Role;

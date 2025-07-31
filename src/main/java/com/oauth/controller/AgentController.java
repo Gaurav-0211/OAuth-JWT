@@ -61,7 +61,10 @@ public class AgentController {
     @GetMapping("/all")
     public ResponseEntity<List<AgentDto>> getAll(){
         List<AgentDto> agents = this.agentService.getAllAgent();
-        return new ResponseEntity<List<AgentDto>>(agents, HttpStatus.OK);
+        if(agents != null && !agents.isEmpty()) {
+            return new ResponseEntity<List<AgentDto>>(agents, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping("/{id}")
