@@ -1,6 +1,6 @@
 package com.oauth.service.impl;
 
-import com.oauth.config.AppConstants;
+import com.oauth.config.RoleType;
 import com.oauth.dto.AgentDto;
 import com.oauth.entity.Agent;
 import com.oauth.entity.Role;
@@ -42,8 +42,8 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
         }
         Agent agent = this.mapper.map(agentDto, Agent.class);
         agent.setPassword(passwordEncoder.encode(agent.getPassword()));
-        Role role = this.roleRepo.findById(AppConstants.NORMAL)
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "ID", AppConstants.NORMAL));
+        Role role = this.roleRepo.findById(4)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "ID", RoleType.SUPER_ADMIN.ordinal()));
         agent.setRole(role);
         this.agentRepo.save(agent);
         return this.mapper.map(agent,AgentDto.class);
@@ -85,12 +85,15 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Agent agent = agentRepo.findByEmail(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Agent","Agent Id"+username,0));
+                .orElseThrow(() -> new ResourceNotFoundException("Agent", "Agent Id " + username, 0));
+
+        String roleName = "ROLE_" + agent.getRole().getName().name(); // Properly formatted
 
         return new org.springframework.security.core.userdetails.User(
                 agent.getEmail(),
                 agent.getPassword(),
-                List.of(new SimpleGrantedAuthority(agent.getRole().getName()))
+                List.of(new SimpleGrantedAuthority(roleName))
         );
     }
+
 }

@@ -42,10 +42,10 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.PUT, "/api/agents/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/agents/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/agents/**").hasAnyRole("ADMIN","SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/agents/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                         //.requestMatchers(HttpMethod.POST, "/api/agents/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.GET, "/api/agents/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/agents/**").hasAnyRole("NORMAL", "ADMIN","SUPER_ADMIN")
                         .requestMatchers(HttpMethod.POST).permitAll()
                         .anyRequest().authenticated()
                 );

@@ -73,7 +73,7 @@ public class AgentController {
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto request) {
 
-        // 1. Authenticate
+        // 1. Authenticate credentials
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -81,22 +81,26 @@ public class AgentController {
                 )
         );
 
-        // 2. Load user
+        // 2. Load UserDetails
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
 
-        // 3. Get role from agent
+        // 3. Get agent from DB
         Agent agent = agentRepo.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("Agent","Agent Id",0));
+                .orElseThrow(() -> new ResourceNotFoundException("Agent", "Email", 0));
 
-        String role = agent.getRole().getName();
+        // 4. Compare role
+        String dbRole = agent.getRole().getName().name(); // assuming enum stored in DB
+        String requestRole = request.getRole().name();
 
-        // 4. Generate token
-        String token = jwtTokenHelper.generateToken(userDetails, role);
+        if (!dbRole.equalsIgnoreCase(requestRole)) {
+            throw new RuntimeException("Access denied: Role mismatch. You are not authorized as " + requestRole);
+        }
 
-        // 5. Return response
-        return ResponseEntity.ok(new JwtAuthResponse(token, role));
+        // 5. Generate JWT with role
+        String token = jwtTokenHelper.generateToken(userDetails, dbRole);
+
+        // 6. Return token and role in response
+        return ResponseEntity.ok(new JwtAuthResponse(token, dbRole));
     }
-
-
 
 }
