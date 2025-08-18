@@ -3,6 +3,7 @@ package com.oauth.controller;
 import com.oauth.dto.AgentDto;
 import com.oauth.dto.JwtAuthResponse;
 import com.oauth.dto.LoginDto;
+import com.oauth.dto.Response;
 import com.oauth.entity.Agent;
 import com.oauth.exception.ResourceNotFoundException;
 import com.oauth.repo.AgentRepo;
@@ -10,7 +11,6 @@ import com.oauth.security.JwtTokenHelper;
 import com.oauth.service.AgentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,10 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/agents")
@@ -43,45 +40,70 @@ public class AgentController {
     private JwtTokenHelper jwtTokenHelper;
 
     @PostMapping("/register")
-    public ResponseEntity<AgentDto> create(@RequestBody @Valid AgentDto agentDto){
-        try {
+    public ResponseEntity<Response> create(@RequestBody @Valid AgentDto agentDto){
             AgentDto agentDto1 = this.agentService.createAgent(agentDto);
-            return new ResponseEntity<AgentDto>(agentDto1, HttpStatus.CREATED);
-        }catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+            Response response = Response.buildResponse(
+            "success",
+                    "User Created Successfully",
+                    201,
+                    agentDto1,
+                    "Process Executed Successfully"
+            );
+            return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AgentDto> getById(@PathVariable Integer id){
+    public ResponseEntity<Response> getById(@PathVariable Integer id)
+    {
         AgentDto agentDto = this.agentService.getById(id);
-        return new ResponseEntity<AgentDto>(agentDto, HttpStatus.OK);
+        Response response = Response.buildResponse(
+                "success",
+                "UserFetched Successful",
+                200,
+                agentDto,
+                "Executed Successfully"
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<AgentDto>> getAll(){
+    public ResponseEntity<Response> getAll(){
         List<AgentDto> agents = this.agentService.getAllAgent();
-        if(agents != null && !agents.isEmpty()) {
-            return new ResponseEntity<List<AgentDto>>(agents, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Response response = Response.buildResponse(
+                "success",
+                "UserFetched Successful",
+                200,
+                agents,
+                "Executed Successfully"
+        );
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Integer id) {
+    public ResponseEntity<Response> deleteUser(@PathVariable Integer id) {
         this.agentService.deleteAgent(id);
-
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "User with ID " + id + " has been successfully deleted.");
-
+        Response response = Response.buildResponse(
+                "success",
+                "User Deleted Successful",
+                200,
+                null,
+                "Executed Successfully"
+        );
         return ResponseEntity.ok(response);
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<AgentDto> update(@RequestBody AgentDto agentDto, @PathVariable Integer id){
+    public ResponseEntity<Response> update(@RequestBody AgentDto agentDto, @PathVariable Integer id){
         AgentDto agentDto1 = this.agentService.updateAgent(agentDto, id);
-        return new ResponseEntity<AgentDto>(agentDto1, HttpStatus.OK);
+        Response response = Response.buildResponse(
+                "success",
+                "User Updated Successful",
+                200,
+                agentDto1,
+                "Executed Successfully"
+        );
+        return ResponseEntity.ok(response);
     }
 
 
