@@ -3,7 +3,8 @@ package com.oauth.service.impl;
 import com.oauth.dto.AgentDto;
 import com.oauth.entity.Agent;
 import com.oauth.entity.Role;
-import com.oauth.exception.ResourceNotFoundException;
+import com.oauth.exception.NoUserExist;
+import com.oauth.exception.UserAlreadyExist;
 import com.oauth.repo.AgentRepo;
 import com.oauth.repo.RoleRepo;
 import com.oauth.service.AgentService;
@@ -39,12 +40,12 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
     @Override
     public AgentDto createAgent(AgentDto agentDto) {
         if(this.agentRepo.existsByEmail(agentDto.getEmail())){
-            throw new RuntimeException("Agent Already exist");
+            throw new UserAlreadyExist("Agent Already exist");
         }
         Agent agent = this.mapper.map(agentDto, Agent.class);
         agent.setPassword(passwordEncoder.encode(agent.getPassword()));
 
-        Role role = roleRepo.findById(agentDto.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Role","Role not found with roleId: " + agentDto.getRoleId(), agentDto.getRoleId()));
+        Role role = roleRepo.findById(agentDto.getRoleId()).orElseThrow(() -> new NoUserExist("Role Not found"));
         agent.setRole(role);
 
         this.agentRepo.save(agent);
@@ -54,7 +55,7 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
     @Override
     public AgentDto getById(Integer id) {
         Agent agent = this.agentRepo.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Agent","Agent Id", id));
+                .orElseThrow(()-> new NoUserExist("No User exist with the given Id"));
         return this.mapper.map(agent, AgentDto.class);
     }
 
@@ -67,14 +68,14 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
     @Override
     public void deleteAgent(Integer id) {
         Agent agent = this.agentRepo.findById(id)
-                .orElseThrow(()->new ResourceNotFoundException("Agent","Agent Id", id));
+                .orElseThrow(()->new NoUserExist("No Agent Exist with the given Id"));
         agentRepo.delete(agent);
     }
 
     @Override
     public AgentDto updateAgent(AgentDto agentDto, Integer id) {
         Agent agent = this.agentRepo.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Agent", "Agent Id", id));
+                .orElseThrow(()-> new NoUserExist("No Agent exist with the given Id"));
         agent.setEmail(agentDto.getEmail());
         agent.setAgentName(agentDto.getAgentName());
         agent.setPassword(passwordEncoder.encode(agentDto.getPassword()));
@@ -87,7 +88,7 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Agent agent = agentRepo.findByEmail(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Agent", "Agent Id " + username, 0));
+                .orElseThrow(() -> new NoUserExist("No User exist with the given name"));
 
         String roleName = "ROLE_" + agent.getRole().getName().name(); // Properly formatted
 

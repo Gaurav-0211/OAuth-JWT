@@ -34,6 +34,7 @@ public class Response implements Serializable {
         response.setMessage(message);
         response.setData(data);
         response.setStatusCode(statusCode);
+
         response.setResponse_status(response_status);
         response.setTimeStamp(LocalDateTime.now());
         return response;

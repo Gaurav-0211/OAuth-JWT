@@ -5,7 +5,7 @@ import com.oauth.dto.JwtAuthResponse;
 import com.oauth.dto.LoginDto;
 import com.oauth.dto.Response;
 import com.oauth.entity.Agent;
-import com.oauth.exception.ResourceNotFoundException;
+import com.oauth.exception.NoUserExist;
 import com.oauth.repo.AgentRepo;
 import com.oauth.security.JwtTokenHelper;
 import com.oauth.service.AgentService;
@@ -123,7 +123,7 @@ public class AgentController {
 
         // 3. Get agent from DB
         Agent agent = agentRepo.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("Agent", "Email", 0));
+                .orElseThrow(() -> new NoUserExist("Agent not found"));
 
         // 4. Compare role
         String dbRole = agent.getRole().getName().name(); // assuming enum stored in DB
