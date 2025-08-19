@@ -38,6 +38,7 @@ public class AgentController {
     @Autowired
     private JwtTokenHelper jwtTokenHelper;
 
+    // Api to Register a new user or deleted account can re- register from here
     @PostMapping("/register")
     public ResponseEntity<Response> create(@RequestBody @Valid AgentDto agentDto){
             AgentDto agentDto1 = this.agentService.createAgent(agentDto);
@@ -51,6 +52,7 @@ public class AgentController {
             return ResponseEntity.ok(response);
     }
 
+    // Get Agent by id api
     @GetMapping("/{id}")
     public ResponseEntity<Response> getById(@PathVariable Integer id)
     {
@@ -65,6 +67,7 @@ public class AgentController {
         return ResponseEntity.ok(response);
     }
 
+    // Get all Agents stored in db
     @GetMapping("/all")
     public ResponseEntity<Response> getAll(){
         List<AgentDto> agents = this.agentService.getAllAgent();
@@ -78,6 +81,7 @@ public class AgentController {
         return ResponseEntity.ok(response);
     }
 
+    // Delete an existing agent from record
     @DeleteMapping("/{id}")
     public ResponseEntity<Response> deleteUser(@PathVariable Integer id) {
         this.agentService.deleteAgent(id);
@@ -91,6 +95,7 @@ public class AgentController {
         return ResponseEntity.ok(response);
     }
 
+    // Get all Agent by state
     @GetMapping("/state")
     public ResponseEntity<Response> getAgentsByState(@RequestParam String state){
        List<AgentDto> agents =  this.agentService.getByState(state);
@@ -104,6 +109,7 @@ public class AgentController {
         return ResponseEntity.ok(response);
     }
 
+    // Get all Agent by city
     @GetMapping("/city")
     public ResponseEntity<Response> getAgentsByCity(@RequestParam String city){
         List<AgentDto> agents = this.agentService.getByCity(city);
@@ -118,6 +124,7 @@ public class AgentController {
     }
 
 
+    // Update an Agent details after register
     @PutMapping("/{id}")
     public ResponseEntity<Response> update(@RequestBody AgentDto agentDto, @PathVariable Integer id){
         AgentDto agentDto1 = this.agentService.updateAgent(agentDto, id);
@@ -131,6 +138,7 @@ public class AgentController {
         return ResponseEntity.ok(response);
     }
 
+    // Get agents in pages like in one page limited user will be visible rather than entier database record
     @GetMapping("/getAll-byPage")
     public ResponseEntity<Response> getAllAgentsByPage(
             @RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
@@ -161,6 +169,7 @@ public class AgentController {
     }
 
 
+    // Login Agent to get the token for getting api based on their role
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto request) {
 

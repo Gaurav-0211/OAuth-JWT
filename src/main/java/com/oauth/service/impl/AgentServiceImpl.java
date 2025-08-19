@@ -130,6 +130,7 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
         return agents.stream().map((agent)-> this.mapper.map(agent, AgentDto.class)).collect(Collectors.toList());
     }
 
+    // Api to get all agent in page manner all are can be sorted at runtime demand (Input - pageNumber, pageSize, sortBy, sortDirection)
     @Override
     public AgentResponse getAllAgentByPage(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
         log.info("Get all agent in pages service impl triggered");
