@@ -1,9 +1,7 @@
 package com.oauth.controller;
 
-import com.oauth.dto.AgentDto;
-import com.oauth.dto.JwtAuthResponse;
-import com.oauth.dto.LoginDto;
-import com.oauth.dto.Response;
+import com.oauth.config.AppConstants;
+import com.oauth.dto.*;
 import com.oauth.entity.Agent;
 import com.oauth.exception.NoUserExist;
 import com.oauth.repo.AgentRepo;
@@ -130,6 +128,35 @@ public class AgentController {
                 agentDto1,
                 "Executed Successfully"
         );
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getAll-byPage")
+    public ResponseEntity<Response> getAllAgentsByPage(
+            @RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY,required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIR, required = false) String sortDir)
+    {
+        AgentResponse agents = this.agentService.getAllAgentByPage(pageNumber, pageSize, sortBy, sortDir);
+        Response response;
+        if(agents == null){
+             response = Response.buildResponse(
+                    "FAILED",
+                    "No Agent Fetched",
+                    HttpStatus.NOT_FOUND.value(),
+                    null,
+                    "Execution success"
+            );
+        }else{
+             response = Response.buildResponse(
+                    "Success",
+                    "All Agent Fetched Success",
+                    HttpStatus.OK.value(),
+                    agents,
+                    "Executed success"
+            );
+        }
         return ResponseEntity.ok(response);
     }
 

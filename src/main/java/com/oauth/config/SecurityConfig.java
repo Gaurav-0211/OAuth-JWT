@@ -37,21 +37,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        //.requestMatchers(HttpMethod.PUT, "/api/agents/**").hasAnyRole("ADMIN","SUPER_ADMIN")
-                        //.requestMatchers(HttpMethod.DELETE, "/api/agents/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
-                        //.requestMatchers(HttpMethod.POST, "/api/agents/**").hasRole("USER")
-                        //.requestMatchers(HttpMethod.GET, "/api/agents/**").hasAnyRole("NORMAL", "ADMIN","SUPER_ADMIN")
-                        .requestMatchers(HttpMethod.POST).permitAll()
-                        .requestMatchers(HttpMethod.GET).permitAll()
-                        .requestMatchers(HttpMethod.PUT).permitAll()
-                        .requestMatchers(HttpMethod.DELETE).permitAll()
-                        .anyRequest().authenticated()
-                );
+                .formLogin(Customizer.withDefaults());
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .cors(Customizer.withDefaults())
+//                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .authorizeHttpRequests(auth -> auth
+//                        //.requestMatchers(HttpMethod.PUT, "/api/agents/**").hasAnyRole("ADMIN","SUPER_ADMIN")
+//                        //.requestMatchers(HttpMethod.DELETE, "/api/agents/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+//                        //.requestMatchers(HttpMethod.POST, "/api/agents/**").hasRole("USER")
+//                        //.requestMatchers(HttpMethod.GET, "/api/agents/**").hasAnyRole("NORMAL", "ADMIN","SUPER_ADMIN")
+//                        .requestMatchers(HttpMethod.POST).permitAll()
+//                        .requestMatchers(HttpMethod.GET).permitAll()
+//                        .requestMatchers(HttpMethod.PUT).permitAll()
+//                        .requestMatchers(HttpMethod.DELETE).permitAll()
+//                        .anyRequest().authenticated()
+//                );
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
