@@ -10,4 +10,7 @@ public interface AgentService {
     List<AgentDto> getAllAgent();
     void deleteAgent(Integer id);
     AgentDto updateAgent(AgentDto agentDto, Integer id);
+    List<AgentDto> getByState(String stateName);
+    List<AgentDto> getByCity(String cityName);
+
 }

@@ -37,6 +37,7 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
     @Autowired
     private RoleRepo roleRepo;
 
+    // Register a new agent
     @Override
     public AgentDto createAgent(AgentDto agentDto) {
         if(this.agentRepo.existsByEmail(agentDto.getEmail())){
@@ -52,6 +53,7 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
         return this.mapper.map(agent,AgentDto.class);
     }
 
+    // get a single agent by its id
     @Override
     public AgentDto getById(Integer id) {
         Agent agent = this.agentRepo.findById(id)
@@ -59,12 +61,14 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
         return this.mapper.map(agent, AgentDto.class);
     }
 
+    // Get all agent details
     @Override
     public List<AgentDto> getAllAgent() {
         List<Agent> agents = this.agentRepo.findAll();
         return agents.stream().map((agent)-> this.mapper.map(agent,AgentDto.class)).collect(Collectors.toList());
     }
 
+    // Delete an agent from the list
     @Override
     public void deleteAgent(Integer id) {
         Agent agent = this.agentRepo.findById(id)
@@ -72,6 +76,7 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
         agentRepo.delete(agent);
     }
 
+    // Update agent details
     @Override
     public AgentDto updateAgent(AgentDto agentDto, Integer id) {
         Agent agent = this.agentRepo.findById(id)
@@ -83,6 +88,26 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
         agent.setAgentState(agentDto.getAgentState());
         this.agentRepo.save(agent);
         return this.mapper.map(agent, AgentDto.class);
+    }
+
+    // Get all Agents BY state name
+    @Override
+    public List<AgentDto> getByState(String stateName) {
+        List<Agent> agents = agentRepo.findByState(stateName);
+        if(agents == null){
+            throw new NoUserExist("No state exist with the given name");
+        }
+        return agents.stream().map((agent)-> this.mapper.map(agent,AgentDto.class)).collect(Collectors.toList());
+    }
+
+    // Get all agents by city name
+    @Override
+    public List<AgentDto> getByCity(String cityName) {
+        List<Agent> agents = agentRepo.findByCity(cityName);
+        if(agents == null){
+            throw new NoUserExist("No agent found with the given city");
+        }
+        return agents.stream().map((agent)-> this.mapper.map(agent, AgentDto.class)).collect(Collectors.toList());
     }
 
     @Override

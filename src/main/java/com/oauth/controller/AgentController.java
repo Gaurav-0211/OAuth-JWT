@@ -11,6 +11,7 @@ import com.oauth.security.JwtTokenHelper;
 import com.oauth.service.AgentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,7 +45,7 @@ public class AgentController {
             AgentDto agentDto1 = this.agentService.createAgent(agentDto);
             Response response = Response.buildResponse(
             "success",
-                    "User Created Successfully",
+                    "Agent Registered Successfully",
                     201,
                     agentDto1,
                     "Process Executed Successfully"
@@ -58,7 +59,7 @@ public class AgentController {
         AgentDto agentDto = this.agentService.getById(id);
         Response response = Response.buildResponse(
                 "success",
-                "UserFetched Successful",
+                "Agent Fetched Successful",
                 200,
                 agentDto,
                 "Executed Successfully"
@@ -71,7 +72,7 @@ public class AgentController {
         List<AgentDto> agents = this.agentService.getAllAgent();
         Response response = Response.buildResponse(
                 "success",
-                "UserFetched Successful",
+                "Agent Fetched Successful",
                 200,
                 agents,
                 "Executed Successfully"
@@ -84,11 +85,37 @@ public class AgentController {
         this.agentService.deleteAgent(id);
         Response response = Response.buildResponse(
                 "success",
-                "User Deleted Successful",
+                "Agent Deleted Successful",
                 200,
                 null,
                 "Executed Successfully"
         );
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/state")
+    public ResponseEntity<Response> getAgentsByState(@RequestParam String state){
+       List<AgentDto> agents =  this.agentService.getByState(state);
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "All Agent Fetched Successfully",
+                HttpStatus.OK.value(),
+                agents,
+                "Execution success"
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/city")
+    public ResponseEntity<Response> getAgentsByCity(@RequestParam String city){
+        List<AgentDto> agents = this.agentService.getByCity(city);
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "Agent fetched success",
+                HttpStatus.OK.value(),
+                agents,
+                "Executed success"
+                );
         return ResponseEntity.ok(response);
     }
 
@@ -98,7 +125,7 @@ public class AgentController {
         AgentDto agentDto1 = this.agentService.updateAgent(agentDto, id);
         Response response = Response.buildResponse(
                 "success",
-                "User Updated Successful",
+                "Agent Updated Successful",
                 200,
                 agentDto1,
                 "Executed Successfully"
