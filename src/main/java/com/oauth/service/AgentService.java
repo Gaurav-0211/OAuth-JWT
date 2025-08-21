@@ -22,4 +22,12 @@ public interface AgentService {
 
     AgentResponse getAllAgentByPage(Integer pageNumber, Integer pageSize, String sortBy, String sortDir);
 
+    List<AgentDto> getAllAgentInDesc();
+
+    List<AgentDto> getAllAgentByFirstName(String name);
+
+    String changePassword(String email, String newPassword, String confirmPassword);
+
+    List<AgentDto> getAllAgentNameEndWith(String name);
+
 }

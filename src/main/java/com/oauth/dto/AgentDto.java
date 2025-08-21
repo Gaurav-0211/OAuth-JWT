@@ -1,6 +1,7 @@
 package com.oauth.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ public class AgentDto {
 
     @NotBlank(message = "Password must contain alpha-numeric and special character value")
     @Size(min = 6, max = 20, message = "Make a secure password with special characters")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @NotBlank(message = "Mobile Number is Required")

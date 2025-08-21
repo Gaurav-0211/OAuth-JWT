@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 @Slf4j
 @Service
@@ -61,7 +63,7 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
         return this.mapper.map(agent,AgentDto.class);
     }
 
-    // get a single agent by its id
+    // Get a single agent by its id
     @Override
     public AgentDto getById(Integer id) {
         log.info("Get Agent By Id api in Service Impl triggered");
@@ -158,11 +160,69 @@ public class AgentServiceImpl implements AgentService, UserDetailsService {
                 .build();
     }
 
+    // API to get all agent  by name in descending order
+    @Override
+    public List<AgentDto> getAllAgentInDesc() {
+        log.info("Get all Agent By Name Desc in Service Impl triggered");
+        List<Agent> agents= agentRepo.findByAgentNameDesc();
+        if(agents == null){
+            throw new NoUserExist("No User found with the given name");
+        }
+        log.info("Get all Agent By Name Desc in Service Impl executed");
+        return agents.stream().map((agent)-> this.mapper.map(agent, AgentDto.class)).collect(Collectors.toList());
+    }
+
+    // API to Get all Agent By their First Name
+    @Override
+    public List<AgentDto> getAllAgentByFirstName(String name) {
+        log.info("Get Agent By first name Service Impl triggered");
+        List<Agent> agents = this.agentRepo.findByAgentNameStartWith(name);
+        if(agents == null){
+            throw new NoUserExist("No User Exist with the given Start Name");
+        }
+        log.info("Get Agent by Start Name service Impl executed");
+        return agents.stream().map((agent)-> this.mapper.map(agent, AgentDto.class)).collect(Collectors.toList());
+    }
+
+    // Change Password API
+    @Override
+    public String changePassword(String email, String newPassword, String confirmPassword) {
+        log.info("change password in service Impl triggered");
+        Agent agent = this.agentRepo.findByEmail(email);
+        if(agent == null){
+            throw new NoUserExist("No Agent exist with the given mail id");
+        }
+        if(!newPassword.equals(confirmPassword)){
+            return "Password doesn't match";
+        }
+        if(passwordEncoder.matches(newPassword, agent.getPassword())){
+            return "New Password cannot be same as old Password";
+        }
+        agent.setPassword(newPassword);
+        this.agentRepo.save(agent);
+        log.info("change password in service Impl executed");
+        return "Password changed success";
+    }
+
+    @Override
+    public List<AgentDto> getAllAgentNameEndWith(String name) {
+        log.info("Get all agent with name end with service Impl triggered");
+        List<Agent> agents = this.agentRepo.findByAgentNameEndWith(name);
+        if(agents == null){
+            throw new NoUserExist("No Agent exist with name ends with "+ name);
+        }
+        log.info("Get all agent name end with service Impl executed");
+        return agents.stream().map((agent)-> this.mapper.map(agent, AgentDto.class)).collect(Collectors.toList());
+
+    }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Agent agent = agentRepo.findByEmail(username)
-                .orElseThrow(() -> new NoUserExist("No User exist with the given name"));
+        Agent agent = agentRepo.findByEmail(username);
+        if(agent == null){
+            throw new NoUserExist("No Agent exist with the given email Id");
+        }
 
         String roleName = "ROLE_" + agent.getRole().getName().name(); // Properly formatted
 

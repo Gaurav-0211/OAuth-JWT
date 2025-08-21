@@ -185,8 +185,10 @@ public class AgentController {
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
 
         // 3. Get agent from DB
-        Agent agent = agentRepo.findByEmail(request.getEmail())
-                .orElseThrow(() -> new NoUserExist("Agent not found"));
+        Agent agent = agentRepo.findByEmail(request.getEmail());
+        if(agent == null){
+            throw new NoUserExist("No agent exist with the given mail Id");
+        }
 
         // 4. Compare role
         String dbRole = agent.getRole().getName().name(); // assuming enum stored in DB
@@ -202,5 +204,73 @@ public class AgentController {
         // 6. Return token and role in response
         return ResponseEntity.ok(new JwtAuthResponse(token, dbRole));
     }
+
+    // Get all Agent By Name in Descending order
+    @GetMapping("/name-desc")
+    public ResponseEntity<Response> getAgentByNameDesc(){
+        List<AgentDto> agents = this.agentService.getAllAgentInDesc();
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "Agent Fetched Success",
+                HttpStatus.OK.value(),
+                agents,
+                "Execution success"
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    // Get All Agent By First Name
+    @GetMapping("/by-firstName")
+    public ResponseEntity<Response> getAgentByFirstName(@RequestParam String name){
+        List<AgentDto>  agents = this.agentService.getAllAgentByFirstName(name);
+        Response response;
+        if(agents != null){
+            response  = Response.buildResponse(
+                    "SUCCESS",
+                    "Agent Found Success",
+                    HttpStatus.OK.value(),
+                    agents,
+                    "Execution process completed"
+            );
+        }else{
+            response = Response.buildResponse(
+                    "FAILED",
+                    "No Agent Found with the given Name",
+                    HttpStatus.NOT_FOUND.value(),
+                    null,
+                    "Execution success"
+            );
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<Response> changePassword(@RequestParam String email, @RequestParam String newPassword,
+                                                   @RequestParam String confirmPassword){
+        String message = this.agentService.changePassword(email, newPassword, confirmPassword);
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                message,
+                HttpStatus.OK.value(),
+                null,
+                "Execution success"
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/name-end-with")
+    public ResponseEntity<Response> getAllAgentNameEndWith(@RequestParam String name){
+        List<AgentDto> agents = this.agentService.getAllAgentNameEndWith(name);
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "Agent fetched success",
+                HttpStatus.OK.value(),
+                agents,
+                "Execution success"
+        );
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }
